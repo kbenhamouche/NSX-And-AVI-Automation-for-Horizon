@@ -92,7 +92,7 @@ resource "nsxt_policy_group" "UAG-Groups" {
 #
 # An example for Service for App that listens on port 8443
 #
-resource "nsxt_policy_service" "8443_service" {
+resource "nsxt_policy_service" "app-8443_service" {
   display_name = "app_service_8443"
   description  = "Service for Horizon that listens on port 8443"
   l4_port_set_entry {
@@ -114,7 +114,7 @@ data "nsxt_policy_service" "https" {
 # All rules in this section will be applied to VMs that are part of the
 # Gropus we created earlier
 #
-resource "nsxt_policy_security_policy" "firewall_section" {
+resource "nsxt_policy_security_policy" "idfw_section" {
   display_name = "Horizon VDI/RDSH IDFW Section by Terraform"
   description  = "Firewall section created by Terraform"
   category     = "Application"
@@ -146,7 +146,7 @@ resource "nsxt_policy_security_policy" "firewall_section" {
   }
 }
 
-resource "nsxt_policy_security_policy" "firewall_section" {
+resource "nsxt_policy_security_policy" "web_section" {
   display_name = "Web app Section by Terraform"
   description  = "Firewall section created by Terraform"
   category     = "Application"
