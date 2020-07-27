@@ -7,7 +7,7 @@ variable "nsx_password" {}
 
 #variables required for AVI connection.
 
-variable "avi_server" {}
+variable "avi_controller" {}
 variable "avi_username" {}
 variable "avi_password" {}
 
@@ -18,9 +18,6 @@ variable "mgmt_net" {}
 variable "cloud_name" {}
 variable "ip_vip" {}
 variable "domain_name" {}
-variable "avi_controller" {}
-variable "avi_username" {}
-variable "avi_password" {}
 variable "avi_api_version" {}
 variable "pool_server1" {}
 variable "pool_server2" {}
