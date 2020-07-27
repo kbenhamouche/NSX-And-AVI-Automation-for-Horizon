@@ -22,7 +22,7 @@ variable "avi_tenant" {
 #variables required for configuration of Avi for Horizon deployment in a shared VIP with L7 and L4 Virtual Services.
 
 variable "ipaddr_placement" {
-  default = "10.5.99.151"
+  default = "172.58.2.0"
 }
 
 variable "mgmt_net" {
