@@ -33,8 +33,6 @@ data "avi_networkprofile" "System-UDP-Fast-Path-VDI" {
    name = "System-UDP-Fast-Path-VDI"
 }
 
-
-
 resource "avi_healthmonitor" "uag-https" {
    monitor_port = 443
    https_monitor {

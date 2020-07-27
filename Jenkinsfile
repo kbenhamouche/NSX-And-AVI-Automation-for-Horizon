@@ -3,6 +3,7 @@ pipeline {
     
     environment {
     	NSX_CRED = credentials('nsx_credentials')
+		AVI_CRED = credentials('avi_credentials')
     }
     
     triggers {
@@ -28,8 +29,8 @@ pipeline {
         
 		stage ("2. Tf Plan and Apply") {
 			steps {
-				sh "terraform plan -var 'nsx_username=$NSX_CRED_USR' -var 'nsx_password=$NSX_CRED_PSW'"
-				sh "terraform apply -auto-approve -var 'nsx_username=$NSX_CRED_USR' -var 'nsx_password=$NSX_CRED_PSW'"       		
+				sh "terraform plan -var 'nsx_username=$NSX_CRED_USR' -var 'nsx_password=$NSX_CRED_PSW' -var 'avi_username=$AVI_CRED_USR' -var 'avi_password=$AVI_CRED_PSW'"
+				sh "terraform apply -auto-approve -var 'nsx_username=$NSX_CRED_USR' -var 'nsx_password=$NSX_CRED_PSW' -var 'avi_username=$AVI_CRED_USR' -var 'avi_password=$AVI_CRED_PSW'"       		
 		}
 	}
 	
@@ -47,7 +48,7 @@ pipeline {
 
 		stage ("5. Tf destroy") {
             steps {
-				sh "terraform destroy -auto-approve -var 'nsx_username=$NSX_CRED_USR' -var 'nsx_password=$NSX_CRED_PSW'"
+				sh "terraform destroy -auto-approve -var 'nsx_username=$NSX_CRED_USR' -var 'nsx_password=$NSX_CRED_PSW' -var 'avi_username=$AVI_CRED_USR' -var 'avi_password=$AVI_CRED_PSW'"
             }
 		}
     }
