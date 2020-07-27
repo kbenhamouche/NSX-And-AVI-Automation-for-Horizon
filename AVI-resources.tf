@@ -119,7 +119,7 @@ resource "avi_vsvip" "horizon_vsvip" {
          addr = var.ip_vip
          type = "V4"
       }
-      placement_networks {
+      /*placement_networks {
          subnet {
             ip_addr {
                addr = var.ipaddr_placement
@@ -128,7 +128,7 @@ resource "avi_vsvip" "horizon_vsvip" {
          mask = 24
          }
          network_ref = data.avi_network.placement_net.id
-      }
+      }*/
    }
    dns_info {
       fqdn = var.domain_name
