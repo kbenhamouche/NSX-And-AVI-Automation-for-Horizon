@@ -119,6 +119,7 @@ resource "nsxt_policy_security_policy" "web_section" {
   display_name = "Horizon - Web app Section by Terraform"
   description  = "Firewall section created by Terraform"
   category     = "Application"
+  sequence_number  = 2
   locked       = "false"
   stateful     = "true"
 
@@ -142,6 +143,7 @@ resource "nsxt_policy_security_policy" "idfw_section" {
   category     = "Application"
   locked       = "false"
   stateful     = "true"
+  sequence_number = 1
 
   # Allow communication from AD Users to Webs via HTTPS
   rule {
