@@ -9,3 +9,11 @@ provider "nsxt" {
   retry_max_delay          = 5000
   retry_on_status_codes    = [429]
 }
+
+// Configure the AVI provider
+provider "avi" {
+    avi_username   = var.avi_username
+    avi_password   = var.avi_password
+    avi_controller = "10.5.99.170"
+    avi_tenant     = "admin"
+}
