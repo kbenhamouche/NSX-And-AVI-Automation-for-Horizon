@@ -34,7 +34,7 @@ variable "cloud_name" {
 }
 
 variable "ip_vip" {
-  default = "172.58.2.110"
+  default = "172.58.2.115"
 }
 
 variable "domain_name" {
@@ -58,11 +58,11 @@ variable "horizon_cert" {
 }
 
 variable "horizon_hm" {
-  default = "Horizon-Health-Monitor"
+  default = "Horizon-HTTPS-Health-Monitor"
 }
 
 variable "ip_group" {
-  default = "Horizon-UAG-Pool"
+  default = "Horizon-UAG-Servers-Group"
 }
 
 variable "ssl_profile" {
@@ -70,7 +70,7 @@ variable "ssl_profile" {
 }
 
 variable "l4_pool" {
-  default = "Horizon-UAG-L4-Pool"
+  default = "Horizon-L4-Pool"
 }
 
 variable "l4_app_profile" {
@@ -78,12 +78,12 @@ variable "l4_app_profile" {
 }
 
 variable "l7_pool" {
-  default = "Horizon-UAG-L7-Pool"
+  default = "Horizon-L7-Pool"
 }
 
 variable "l7_vs" {
-  default = "Horizon-L7-VS"
+  default = "Horizon-UAG-L7-VS"
 }
 variable "l4_vs" {
-  default = "Horizon-L4-VS"
+  default = "Horizon-UAG-L4-VS"
 }

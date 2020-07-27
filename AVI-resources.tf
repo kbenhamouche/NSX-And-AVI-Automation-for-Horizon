@@ -33,6 +33,7 @@ data "avi_networkprofile" "System-UDP-Fast-Path-VDI" {
    name = "System-UDP-Fast-Path-VDI"
 }
 
+// Custom Heath Monitor
 resource "avi_healthmonitor" "uag-https" {
    monitor_port = 443
    https_monitor {
@@ -50,6 +51,7 @@ resource "avi_healthmonitor" "uag-https" {
    type = "HEALTH_MONITOR_HTTPS"
 }
 
+// UAG IP Group
 resource "avi_ipaddrgroup" "uag_ip_group" {
    name = var.ip_group
    addrs {
@@ -62,32 +64,7 @@ resource "avi_ipaddrgroup" "uag_ip_group" {
    }
 }
 
-
-resource "avi_pool" "blast_pcoip_pool" {
-   lb_algorithm = "LB_ALGORITHM_CONSISTENT_HASH"
-   lb_algorithm_hash = "LB_ALGORITHM_CONSISTENT_HASH_SOURCE_IP_ADDRESS"
-   cloud_ref = data.avi_cloud.horizon_cloud.id
-   default_server_port = 443
-   use_service_port = true
-   health_monitor_refs = [
-      avi_healthmonitor.uag-https.id
-   ]
-   ipaddrgroup_ref = avi_ipaddrgroup.uag_ip_group.id
-   /*placement_networks {
-      subnet {
-         ip_addr {
-            addr = var.ipaddr_placement
-            type = "V4"
-         }
-         mask = 24
-      }
-      network_ref = data.avi_network.placement_net.id
-   }*/
-   name = var.l4_pool
-}
-
-
-
+// HTTPS L7 Pool
 resource "avi_pool" "https_xml-api_pool" {
    lb_algorithm = "LB_ALGORITHM_CONSISTENT_HASH"
    lb_algorithm_hash = "LB_ALGORITHM_CONSISTENT_HASH_SOURCE_IP_ADDRESS"
@@ -111,6 +88,31 @@ resource "avi_pool" "https_xml-api_pool" {
    name = var.l7_pool
 }
 
+// BLAST and PCoIP L4 Pool
+resource "avi_pool" "blast_pcoip_pool" {
+   lb_algorithm = "LB_ALGORITHM_CONSISTENT_HASH"
+   lb_algorithm_hash = "LB_ALGORITHM_CONSISTENT_HASH_SOURCE_IP_ADDRESS"
+   cloud_ref = data.avi_cloud.horizon_cloud.id
+   default_server_port = 443
+   use_service_port = true
+   health_monitor_refs = [
+      avi_healthmonitor.uag-https.id
+   ]
+   ipaddrgroup_ref = avi_ipaddrgroup.uag_ip_group.id
+   /*placement_networks {
+      subnet {
+         ip_addr {
+            addr = var.ipaddr_placement
+            type = "V4"
+         }
+         mask = 24
+      }
+      network_ref = data.avi_network.placement_net.id
+   }*/
+   name = var.l4_pool
+}
+
+// 
 resource "avi_vsvip" "horizon_vsvip" {
    name = "horizon-vsvip"
    cloud_ref = data.avi_cloud.horizon_cloud.id
@@ -135,7 +137,7 @@ resource "avi_vsvip" "horizon_vsvip" {
    }
 }
 
-
+// L7 Virtual Service
 resource "avi_virtualservice" "https_xml-api_VS" {
    name = var.l7_vs
    services {
@@ -151,6 +153,7 @@ resource "avi_virtualservice" "https_xml-api_VS" {
    vsvip_ref = avi_vsvip.horizon_vsvip.id
 }
 
+// L4 Virtual Service
 resource "avi_virtualservice" "blast_pcoip_VS" {
    name = var.l4_vs
    services {
@@ -176,5 +179,4 @@ resource "avi_virtualservice" "blast_pcoip_VS" {
    network_profile_ref = data.avi_networkprofile.system-tcp-proxy.id
    cloud_ref = data.avi_cloud.horizon_cloud.id
    vsvip_ref = avi_vsvip.horizon_vsvip.id
-
 }
