@@ -73,7 +73,7 @@ resource "avi_pool" "blast_pcoip_pool" {
       avi_healthmonitor.uag-https.id
    ]
    ipaddrgroup_ref = avi_ipaddrgroup.uag_ip_group.id
-   placement_networks {
+   /*placement_networks {
       subnet {
          ip_addr {
             addr = var.ipaddr_placement
@@ -82,7 +82,7 @@ resource "avi_pool" "blast_pcoip_pool" {
          mask = 24
       }
       network_ref = data.avi_network.placement_net.id
-   }
+   }*/
    name = var.l4_pool
 }
 
@@ -98,7 +98,7 @@ resource "avi_pool" "https_xml-api_pool" {
       avi_healthmonitor.uag-https.id
    ]
    ipaddrgroup_ref = avi_ipaddrgroup.uag_ip_group.id
-   placement_networks {
+   /*placement_networks {
       subnet {
          ip_addr {
             addr = var.ipaddr_placement
@@ -107,7 +107,7 @@ resource "avi_pool" "https_xml-api_pool" {
          mask = 24
       }
       network_ref = data.avi_network.placement_net.id
-   }
+   }*/
    name = var.l7_pool
 }
 
