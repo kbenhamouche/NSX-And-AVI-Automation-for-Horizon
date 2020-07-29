@@ -38,7 +38,7 @@ resource "avi_healthmonitor" "uag-https" {
    monitor_port = 443
    https_monitor {
    http_request = "HEAD /favicon.ico HTTP/1.0"
-   http_response_code = [ "HTTP_2XX" ]
+   http_response_code = [ "HTTP_2XX", "HTTP_4XX" ]
    ssl_attributes {
       ssl_profile_ref = data.avi_sslprofile.system-standard.id
       ssl_key_and_certificate_ref = data.avi_sslkeyandcertificate.horizon_cert.id
