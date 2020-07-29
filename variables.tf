@@ -4,16 +4,16 @@
 variable "nsx_server" {
   default = "10.5.99.151"
 }
-variable "nsx_username" {}
-variable "nsx_password" {}
+variable "nsx_username" {} // from Jenkins
+variable "nsx_password" {} // from Jenkins
 
 #variables required for AVI connection.
 
 variable "avi_controller" {
   default = "10.5.99.170"
 }
-variable "avi_username" {}
-variable "avi_password" {}
+variable "avi_username" {} // from Jenkins
+variable "avi_password" {} // from Jenkins
 
 variable "avi_tenant" {
   default = "admin"

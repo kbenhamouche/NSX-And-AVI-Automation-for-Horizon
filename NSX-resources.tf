@@ -3,7 +3,7 @@
 # criteria
 #
 
-# All WEB VMs
+# AD Users Groups
 resource "nsxt_policy_group" "AD-Users-Groups" {
   display_name = "AD-Users_VMs"
   description  = "Group consisting of AD Users"
@@ -92,13 +92,13 @@ resource "nsxt_policy_group" "UAG-Groups" {
 #
 # An example for Service for App that listens on port 8443
 #
-resource "nsxt_policy_service" "app-8443_service" {
-  display_name = "app_service_8443"
-  description  = "Service for Horizon that listens on port 8443"
+resource "nsxt_policy_service" "Horizon-BLAST-PCoIP_services" {
+  display_name = "Horizon-BLAST-PCoIP_services-443-8443-4172"
+  description  = "Services for BLAST and PCoIP Horizon on port 443, 8443, and 4172"
   l4_port_set_entry {
-    description       = "TCP Port 8443"
+    description       = "TCP Port 443, 8443, and 4172"
     protocol          = "TCP"
-    destination_ports = ["8443"]
+    destination_ports = ["443", "8443", "4172"]
   }
 }
 
@@ -109,6 +109,9 @@ data "nsxt_policy_service" "https" {
   display_name = "HTTPS"
 }
 
+data "nsxt_policy_service" "rdp" {
+  display_name = "RDP"
+}
 #
 # In this section, we have example to create Firewall sections and rules
 # All rules in this section will be applied to VMs that are part of the
@@ -167,5 +170,61 @@ resource "nsxt_policy_security_policy" "idfw_section" {
     ip_version   = "IPV4"
     destination_groups = [nsxt_policy_group.WEBs-Groups.path]
     scope              = [nsxt_policy_group.VDI-Groups.path, nsxt_policy_group.RDSH-Groups.path]
+  }
+}
+
+resource "nsxt_policy_security_policy" "UAG_section" {
+  display_name = "Horizon - UAG Section by Terraform"
+  description  = "Firewall section created by Terraform"
+  category     = "Application"
+  locked       = "false"
+  stateful     = "true"
+  //sequence_number = 1
+
+  # Allow communication from any to UAG via HTTPS
+  rule {
+    display_name       = "Allow HTTPS"
+    description        = "In going rule"
+    action             = "ALLOW"
+    logged             = "false"
+    ip_version         = "IPV4"
+    destination_groups = [nsxt_policy_group.UAG-Groups.path]
+    services           = [data.nsxt_policy_service.https.path]
+    scope              = [nsxt_policy_group.UAG-Groups.path]
+  }
+
+  # Allow communication from any to UAG for BLAST and PCoIP
+  rule {
+    display_name       = "Allow BLAST and PCoIP traffic"
+    description        = "In going rule"
+    action             = "ALLOW"
+    logged             = "false"
+    ip_version         = "IPV4"
+    destination_groups = [nsxt_policy_group.UAG-Groups.path]
+    services           = [data.nsxt_policy_service.Horizon-BLAST-PCoIP_services.path]
+    scope              = [nsxt_policy_group.UAG-Groups.path]
+  }
+
+  # Allow communication from UAG to VDI/RDSH via RDP
+  rule {
+    display_name       = "Allow RDP traffic"
+    description        = "In going rule"
+    action             = "ALLOW"
+    logged             = "false"
+    ip_version         = "IPV4"
+    destination_groups = [nsxt_policy_group.VDI-Groups.path, nsxt_policy_group.RDSH-Groups.path]
+    services           = [data.nsxt_policy_service.rdp.path]
+    scope              = [nsxt_policy_group.VDI-Groups.path, nsxt_policy_group.RDSH-Groups.path]
+  }
+
+  # Reject everything else
+  rule {
+    display_name = "Block all"
+    description  = "Default Deny the traffic"
+    action       = "REJECT"
+    logged       = "true"
+    ip_version   = "IPV4"
+    destination_groups = [nsxt_policy_group.UAG-Groups.path]
+    scope              = [nsxt_policy_group.UAG-Groups.path]
   }
 }

@@ -1,6 +1,6 @@
 // Configure the NSXT provider
 provider "nsxt" {
-  host                     = "10.5.99.151"
+  host                     = var.nsx_server
   username                 = var.nsx_username
   password                 = var.nsx_password
   allow_unverified_ssl     = true
@@ -14,6 +14,6 @@ provider "nsxt" {
 provider "avi" {
     avi_username   = var.avi_username
     avi_password   = var.avi_password
-    avi_controller = "10.5.99.170"
-    avi_tenant     = "admin"
+    avi_controller = var.avi_controller
+    avi_tenant     = var.avi_tenant // admin
 }
