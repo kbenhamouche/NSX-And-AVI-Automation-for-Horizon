@@ -118,28 +118,6 @@ data "nsxt_policy_service" "rdp" {
 # Gropus we created earlier
 #
 
-resource "nsxt_policy_security_policy" "web_section" {
-  display_name = "Horizon - Web app Section by Terraform"
-  description  = "Firewall section created by Terraform"
-  category     = "Application"
-  locked       = "false"
-  stateful     = "true"
-  sequence_number  = 3
-
-  # Allow communication from VDI/RDSH to Webs via HTTPS
-  rule {
-    display_name       = "Allow HTTPS"
-    description        = "In going rule"
-    action             = "ALLOW"
-    logged             = "false"
-    ip_version         = "IPV4"
-    source_groups      = [nsxt_policy_group.VDI-Groups.path, nsxt_policy_group.RDSH-Groups.path]
-    destination_groups = [nsxt_policy_group.WEBs-Groups.path]
-    services           = [data.nsxt_policy_service.https.path]
-    scope              = [nsxt_policy_group.WEBs-Groups.path]
-  }
-}
-
 resource "nsxt_policy_security_policy" "idfw_section" {
   display_name = "Horizon - VDI/RDSH IDFW Section by Terraform"
   description  = "Firewall section created by Terraform"
@@ -159,6 +137,19 @@ resource "nsxt_policy_security_policy" "idfw_section" {
     destination_groups = [nsxt_policy_group.WEBs-Groups.path]
     services           = [data.nsxt_policy_service.https.path]
     scope              = [nsxt_policy_group.VDI-Groups.path, nsxt_policy_group.RDSH-Groups.path]
+  }
+
+   # Allow communication from VDI/RDSH to Webs via HTTPS
+  rule {
+    display_name       = "Allow HTTPS"
+    description        = "In going rule"
+    action             = "ALLOW"
+    logged             = "false"
+    ip_version         = "IPV4"
+    source_groups      = [nsxt_policy_group.VDI-Groups.path, nsxt_policy_group.RDSH-Groups.path]
+    destination_groups = [nsxt_policy_group.WEBs-Groups.path]
+    services           = [data.nsxt_policy_service.https.path]
+    scope              = [nsxt_policy_group.WEBs-Groups.path]
   }
 
   # Reject everything else
