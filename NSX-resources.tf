@@ -205,18 +205,6 @@ resource "nsxt_policy_security_policy" "UAG_section" {
     scope              = [nsxt_policy_group.UAG-Groups.path]
   }
 
-  # Allow communication from UAG to VDI/RDSH via RDP
-  rule {
-    display_name       = "Allow RDP traffic"
-    description        = "In going rule"
-    action             = "ALLOW"
-    logged             = "false"
-    ip_version         = "IPV4"
-    destination_groups = [nsxt_policy_group.VDI-Groups.path, nsxt_policy_group.RDSH-Groups.path]
-    services           = [data.nsxt_policy_service.rdp.path]
-    scope              = [nsxt_policy_group.VDI-Groups.path, nsxt_policy_group.RDSH-Groups.path]
-  }
-
   # Reject everything else
   rule {
     display_name = "Block all"
@@ -226,5 +214,18 @@ resource "nsxt_policy_security_policy" "UAG_section" {
     ip_version   = "IPV4"
     destination_groups = [nsxt_policy_group.UAG-Groups.path]
     scope              = [nsxt_policy_group.UAG-Groups.path]
+  }
+  
+  # Allow communication from UAG to VDI/RDSH via RDP
+  rule {
+    display_name       = "Allow RDP traffic"
+    description        = "In going rule"
+    action             = "ALLOW"
+    logged             = "false"
+    ip_version         = "IPV4"
+    source_groups      = [nsxt_policy_group.UAG-Groups.path]
+    destination_groups = [nsxt_policy_group.VDI-Groups.path, nsxt_policy_group.RDSH-Groups.path]
+    services           = [data.nsxt_policy_service.rdp.path]
+    scope              = [nsxt_policy_group.VDI-Groups.path, nsxt_policy_group.RDSH-Groups.path]
   }
 }
