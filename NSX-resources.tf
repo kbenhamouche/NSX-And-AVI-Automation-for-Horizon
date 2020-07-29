@@ -136,7 +136,7 @@ resource "nsxt_policy_security_policy" "idfw_section" {
     source_groups      = [nsxt_policy_group.AD-Users-Groups.path]
     destination_groups = [nsxt_policy_group.WEBs-Groups.path]
     services           = [data.nsxt_policy_service.https.path]
-    scope              = [nsxt_policy_group.VDI-Groups.path, nsxt_policy_group.RDSH-Groups.path]
+    scope              = [nsxt_policy_group.AD-Users-Groups.path, nsxt_policy_group.VDI-Groups.path, nsxt_policy_group.RDSH-Groups.path]
   }
 
    # Allow communication from VDI/RDSH to Webs via HTTPS
@@ -160,7 +160,7 @@ resource "nsxt_policy_security_policy" "idfw_section" {
     logged       = "true"
     ip_version   = "IPV4"
     destination_groups = [nsxt_policy_group.WEBs-Groups.path]
-    scope              = [nsxt_policy_group.VDI-Groups.path, nsxt_policy_group.RDSH-Groups.path]
+    scope              = [nsxt_policy_group.WEBs-Groups.path, nsxt_policy_group.VDI-Groups.path, nsxt_policy_group.RDSH-Groups.path]
   }
 }
 
@@ -217,6 +217,6 @@ resource "nsxt_policy_security_policy" "UAG_section" {
     source_groups      = [nsxt_policy_group.UAG-Groups.path]
     destination_groups = [nsxt_policy_group.VDI-Groups.path, nsxt_policy_group.RDSH-Groups.path]
     services           = [data.nsxt_policy_service.rdp.path]
-    scope              = [nsxt_policy_group.VDI-Groups.path, nsxt_policy_group.RDSH-Groups.path]
+    scope              = [nsxt_policy_group.UAG-Groups.path, nsxt_policy_group.VDI-Groups.path, nsxt_policy_group.RDSH-Groups.path]
   }
 }
