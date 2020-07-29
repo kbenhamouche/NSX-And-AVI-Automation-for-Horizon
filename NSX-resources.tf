@@ -5,7 +5,7 @@
 
 # AD Users Groups
 resource "nsxt_policy_group" "AD-Users-Groups" {
-  display_name = "AD-Users_VMs"
+  display_name = "AD-Users_SG"
   description  = "Group consisting of AD Users"
   criteria {
     condition {
@@ -22,7 +22,7 @@ resource "nsxt_policy_group" "AD-Users-Groups" {
 }
 
 resource "nsxt_policy_group" "WEBs-Groups" {
-  display_name = "WEBs_VMs"
+  display_name = "WEBs_SG"
   description  = "Group consisting of WEBs VMs"
   criteria {
     condition {
@@ -39,7 +39,7 @@ resource "nsxt_policy_group" "WEBs-Groups" {
 }
 
 resource "nsxt_policy_group" "VDI-Groups" {
-  display_name = "VDI_VMs"
+  display_name = "VDI_SG"
   description  = "Group consisting of VDI VMs"
   criteria {
     condition {
@@ -56,7 +56,7 @@ resource "nsxt_policy_group" "VDI-Groups" {
 }
 
 resource "nsxt_policy_group" "RDSH-Groups" {
-  display_name = "RDSH_VMs"
+  display_name = "RDSH_SG"
   description  = "Group consisting of RDSH VMs"
   criteria {
     condition {
@@ -73,7 +73,7 @@ resource "nsxt_policy_group" "RDSH-Groups" {
 }
 
 resource "nsxt_policy_group" "UAG-Groups" {
-  display_name = "UAG_VMs"
+  display_name = "UAG_SG"
   description  = "Group consisting of UAG VMs"
   criteria {
     condition {
