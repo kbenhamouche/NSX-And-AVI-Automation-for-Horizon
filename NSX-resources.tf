@@ -92,7 +92,7 @@ resource "nsxt_policy_group" "UAG-Groups" {
 #
 # An example for Service for App that listens on port 8443
 #
-resource "nsxt_policy_service" "horizon-blast-pcoip_services" {
+resource "nsxt_policy_service" "horizon-blast-pcoip" {
   display_name = "Horizon-BLAST-PCoIP_services-443-8443-4172"
   description  = "Services for BLAST and PCoIP Horizon on port 443, 8443, and 4172"
   l4_port_set_entry {
@@ -201,7 +201,7 @@ resource "nsxt_policy_security_policy" "UAG_section" {
     logged             = "false"
     ip_version         = "IPV4"
     destination_groups = [nsxt_policy_group.UAG-Groups.path]
-    services           = [data.nsxt_policy_service.horizon-blast-pcoip_services.path]
+    services           = [nsxt_policy_service.horizon-blast-pcoip.path]
     scope              = [nsxt_policy_group.UAG-Groups.path]
   }
 
