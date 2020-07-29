@@ -124,7 +124,7 @@ resource "nsxt_policy_security_policy" "web_section" {
   category     = "Application"
   locked       = "false"
   stateful     = "true"
-  //sequence_number  = 2
+  sequence_number  = 3
 
   # Allow communication from VDI/RDSH to Webs via HTTPS
   rule {
@@ -146,7 +146,7 @@ resource "nsxt_policy_security_policy" "idfw_section" {
   category     = "Application"
   locked       = "false"
   stateful     = "true"
-  //sequence_number = 1
+  sequence_number = 2
 
   # Allow communication from AD Users to Webs via HTTPS
   rule {
@@ -179,7 +179,7 @@ resource "nsxt_policy_security_policy" "UAG_section" {
   category     = "Application"
   locked       = "false"
   stateful     = "true"
-  //sequence_number = 1
+  sequence_number = 1
 
   # Allow communication from any to UAG via HTTPS
   rule {
@@ -215,7 +215,7 @@ resource "nsxt_policy_security_policy" "UAG_section" {
     destination_groups = [nsxt_policy_group.UAG-Groups.path]
     scope              = [nsxt_policy_group.UAG-Groups.path]
   }
-  
+
   # Allow communication from UAG to VDI/RDSH via RDP
   rule {
     display_name       = "Allow RDP traffic"
