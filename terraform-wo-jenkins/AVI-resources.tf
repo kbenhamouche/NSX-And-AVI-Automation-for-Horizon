@@ -132,7 +132,7 @@ resource "avi_virtualservice" "https_xml-api_VS" {
    network_profile_ref = data.avi_networkprofile.system-tcp-proxy.id
    cloud_ref = data.avi_cloud.horizon_cloud.id
    vsvip_ref = avi_vsvip.horizon_vsvip.id
-   waf_policy_ref = data.avi_wafpolicy.waf_app_learning_policy.id
+   waf_policy_ref = data.avi_wafpolicy.waf_app_learning_policy.id //WAF config
    analytics_policy {
     metrics_realtime_update {
       enabled  = true
