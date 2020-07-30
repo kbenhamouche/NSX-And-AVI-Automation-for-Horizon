@@ -33,6 +33,10 @@ data "avi_networkprofile" "System-UDP-Fast-Path-VDI" {
    name = "System-UDP-Fast-Path-VDI"
 }
 
+data "avi_wafpolicy" "waf_app_learning_policy" {
+  name = "waf_app_learning_policy"
+}
+
 // Custom Heath Monitor
 resource "avi_healthmonitor" "uag-https" {
    monitor_port = 443
@@ -75,17 +79,14 @@ resource "avi_pool" "https_xml-api_pool" {
       avi_healthmonitor.uag-https.id
    ]
    ipaddrgroup_ref = avi_ipaddrgroup.uag_ip_group.id
-   /*placement_networks {
-      subnet {
-         ip_addr {
-            addr = var.ipaddr_placement
-            type = "V4"
-         }
-         mask = 24
-      }
-      network_ref = data.avi_network.placement_net.id
-   }*/
    name = var.l7_pool
+   fail_action {
+    type = "FAIL_ACTION_CLOSE_CONN"
+   }
+   ignore_servers = true
+   analytics_policy {
+    enable_realtime_metrics = true
+   }
 }
 
 // BLAST and PCoIP L4 Pool
@@ -99,16 +100,6 @@ resource "avi_pool" "blast_pcoip_pool" {
       avi_healthmonitor.uag-https.id
    ]
    ipaddrgroup_ref = avi_ipaddrgroup.uag_ip_group.id
-   /*placement_networks {
-      subnet {
-         ip_addr {
-            addr = var.ipaddr_placement
-            type = "V4"
-         }
-         mask = 24
-      }
-      network_ref = data.avi_network.placement_net.id
-   }*/
    name = var.l4_pool
 }
 
@@ -121,16 +112,6 @@ resource "avi_vsvip" "horizon_vsvip" {
          addr = var.ip_vip
          type = "V4"
       }
-      /*placement_networks {
-         subnet {
-            ip_addr {
-               addr = var.ipaddr_placement
-               type = "V4"
-            }
-         mask = 24
-         }
-         network_ref = data.avi_network.placement_net.id
-      }*/
    }
    dns_info {
       fqdn = var.domain_name
@@ -179,4 +160,38 @@ resource "avi_virtualservice" "blast_pcoip_VS" {
    network_profile_ref = data.avi_networkprofile.system-tcp-proxy.id
    cloud_ref = data.avi_cloud.horizon_cloud.id
    vsvip_ref = avi_vsvip.horizon_vsvip.id
+}
+
+// Pool Group to allow traffic engineering across different versions of application
+resource "avi_poolgroup" "waf_app_pg" {
+  name       = "waf_app_pg"
+  tenant_ref = data.avi_tenant.default_tenant.id
+  members {
+    pool_ref = avi_pool.https_xml-api_pool.id
+    ratio    = 100
+  }
+}
+
+// WAF enabled application
+resource "avi_virtualservice" "waf_vs" {
+  name           = "waf_vs"
+  pool_group_ref = avi_poolgroup.waf_app_pg.id
+  tenant_ref     = data.avi_tenant.default_tenant.id
+  vsvip_ref      = avi_vsvip.horizon_vsvip.id
+  services {
+    port           = 443
+    enable_ssl     = true
+    port_range_end = 443
+  }
+  application_profile_ref      = data.avi_applicationprofile.horizon_L7app_profile.id
+  cloud_type                   = "CLOUD_VCENTER"
+  ssl_key_and_certificate_refs = [data.avi_sslkeyandcertificate.horizon_cert.id]
+  ssl_profile_ref              = data.avi_sslprofile.system-standard.id
+  waf_policy_ref               = data.avi_wafpolicy.waf_app_learning_policy.id
+  analytics_policy {
+    metrics_realtime_update {
+      enabled  = true
+      duration = 0
+    }
+  }
 }
