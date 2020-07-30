@@ -220,3 +220,24 @@ resource "nsxt_policy_security_policy" "UAG_section" {
     scope              = [nsxt_policy_group.UAG-Groups.path, nsxt_policy_group.VDI-Groups.path, nsxt_policy_group.RDSH-Groups.path]
   }
 }
+
+resource "nsxt_policy_security_policy" "vdi-rdsh_section" {
+  display_name = "Horizon - VDI/RDSH Section by Terraform"
+  description  = "Firewall section created by Terraform"
+  category     = "Application"
+  locked       = "false"
+  stateful     = "true"
+  sequence_number = 3
+
+  # Reject traffic between VDI/RDSH VMs
+  rule {
+    display_name = "Block all traffic between VDI/RDSH"
+    description  = "Deny the traffic between VDI/RDSH"
+    action       = "REJECT"
+    logged       = "true"
+    ip_version   = "IPV4"
+    source_groups      = [nsxt_policy_group.VDI-Groups.path, nsxt_policy_group.RDSH-Groups.path]
+    destination_groups = [nsxt_policy_group.VDI-Groups.path, nsxt_policy_group.RDSH-Groups.path]
+    scope              = [nsxt_policy_group.VDI-Groups.path, nsxt_policy_group.RDSH-Groups.path]
+  }
+}
