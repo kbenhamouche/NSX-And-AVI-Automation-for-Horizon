@@ -118,7 +118,7 @@ resource "avi_vsvip" "horizon_vsvip" {
    }
 }
 
-// L7 Virtual Service
+// L7 Virtual Service with WAF
 resource "avi_virtualservice" "https_xml-api_VS" {
    name = var.l7_vs
    services {
@@ -132,6 +132,14 @@ resource "avi_virtualservice" "https_xml-api_VS" {
    network_profile_ref = data.avi_networkprofile.system-tcp-proxy.id
    cloud_ref = data.avi_cloud.horizon_cloud.id
    vsvip_ref = avi_vsvip.horizon_vsvip.id
+   pool_group_ref = avi_poolgroup.waf_app_pg.id
+   waf_policy_ref = data.avi_wafpolicy.waf_app_learning_policy.id
+   analytics_policy {
+    metrics_realtime_update {
+      enabled  = true
+      duration = 0
+    }
+  }
 }
 
 // L4 Virtual Service
@@ -169,29 +177,5 @@ resource "avi_poolgroup" "waf_app_pg" {
   members {
     pool_ref = avi_pool.https_xml-api_pool.id
     ratio    = 100
-  }
-}
-
-// WAF enabled application
-resource "avi_virtualservice" "waf_vs" {
-  name           = "waf_vs"
-  pool_group_ref = avi_poolgroup.waf_app_pg.id
-  //tenant_ref     = data.avi_tenant.default_tenant.id
-  vsvip_ref      = avi_vsvip.horizon_vsvip.id
-  services {
-    port           = 443
-    enable_ssl     = true
-    port_range_end = 443
-  }
-  application_profile_ref      = data.avi_applicationprofile.horizon_L7app_profile.id
-  cloud_type                   = "CLOUD_VCENTER"
-  ssl_key_and_certificate_refs = [data.avi_sslkeyandcertificate.horizon_cert.id]
-  ssl_profile_ref              = data.avi_sslprofile.system-standard.id
-  waf_policy_ref               = data.avi_wafpolicy.waf_app_learning_policy.id
-  analytics_policy {
-    metrics_realtime_update {
-      enabled  = true
-      duration = 0
-    }
   }
 }
