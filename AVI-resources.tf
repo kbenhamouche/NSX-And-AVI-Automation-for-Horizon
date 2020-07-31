@@ -33,8 +33,12 @@ data "avi_networkprofile" "System-UDP-Fast-Path-VDI" {
    name = "System-UDP-Fast-Path-VDI"
 }
 
-data "avi_wafpolicy" "waf_app_learning_policy" {
-  name = "waf_app_learning_policy"
+data "avi_wafprofile" "horizon_waf_profile" {
+  name = "horizon_waf_profile"
+}
+
+data "avi_wafpolicy" "horizon_waf_policy" {
+  name = "horizon_waf_policy"
 }
 
 // Custom Heath Monitor
@@ -103,7 +107,7 @@ resource "avi_pool" "blast_pcoip_pool" {
    name = var.l4_pool
 }
 
-// 
+// Shared VIP@
 resource "avi_vsvip" "horizon_vsvip" {
    name = "horizon-vsvip"
    cloud_ref = data.avi_cloud.horizon_cloud.id
@@ -117,6 +121,46 @@ resource "avi_vsvip" "horizon_vsvip" {
       fqdn = var.domain_name
    }
 }
+
+// WAF profile
+resource "avi_wafprofile" "horizon_waf_profile" {
+  name = "horizon_waf_profile"
+  config {
+    learning_params {
+      enable_per_uri_learning = true
+      max_uris = 100
+      min_hits_to_learn = 20
+      sampling_percent = 100
+      update_interval = 1
+    }
+    max_execution_time = 50
+    min_confidence = "CONFIDENCE_VERY_HIGH"
+    enable_auto_rule_updates = true
+    client_request_max_body_size= 1024
+}
+
+// WAF policy
+resource "avi_wafpolicy" "horizon_waf_policy" {
+  name = "horizon_waf_policy"
+  waf_profile_ref = data.avi_wafpolicy.horizon_waf_policy.id
+  enable_app_learning = false
+  mode = "WAF_MODE_DETECTION_ONLY"
+  paranoia_level = "WAF_MODE_LEVEL_ONLY"
+  whitelist {
+     rules {
+         name = "Tunnel URI whitelist"
+         match {
+           path {
+            match_criteria = "CONTAINS"
+            match_str = "/ice/tunnel/"
+           }
+         actions = "WAF_POLICY_WHITELIST_ACTION_ALLOW"
+        }
+     }
+  }
+}
+
+
 
 // L7 Virtual Service with WAF
 resource "avi_virtualservice" "https_xml-api_VS" {
@@ -132,7 +176,7 @@ resource "avi_virtualservice" "https_xml-api_VS" {
    network_profile_ref = data.avi_networkprofile.system-tcp-proxy.id
    cloud_ref = data.avi_cloud.horizon_cloud.id
    vsvip_ref = avi_vsvip.horizon_vsvip.id
-   waf_policy_ref = data.avi_wafpolicy.waf_app_learning_policy.id //WAF config
+   waf_policy_ref = data.avi_wafpolicy.horizon_waf_profile.id //WAF config
    analytics_policy {
     metrics_realtime_update {
       enabled  = true
