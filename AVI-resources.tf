@@ -133,7 +133,7 @@ resource "avi_vsvip" "horizon_vsvip" {
 }
 
 // WAF profile
-/*resource "avi_wafprofile" "horizon_waf_profile" {
+resource "avi_wafprofile" "horizon_waf_profile" {
   name = "horizon_waf_profile"
   config {
     learning_params {
@@ -146,7 +146,8 @@ resource "avi_vsvip" "horizon_vsvip" {
     max_execution_time = 50
     min_confidence = "CONFIDENCE_VERY_HIGH"
     enable_auto_rule_updates = true
-    //client_request_max_body_size= 1024
+    client_request_max_body_size= 1024
+  }
 }
 
 // WAF policy
@@ -168,7 +169,7 @@ resource "avi_wafpolicy" "horizon_waf_policy" {
         }
      }
    }
-}*/
+}
 
 // L7 Virtual Service with WAF
 resource "avi_virtualservice" "https_xml-api_VS" {
@@ -184,7 +185,7 @@ resource "avi_virtualservice" "https_xml-api_VS" {
    network_profile_ref = data.avi_networkprofile.system-tcp-proxy.id
    cloud_ref = data.avi_cloud.horizon_cloud.id
    vsvip_ref = avi_vsvip.horizon_vsvip.id
-   //waf_policy_ref = data.avi_wafpolicy.horizon_waf_policy.id //WAF config
+   waf_policy_ref = data.avi_wafpolicy.horizon_waf_policy.id //WAF config
    analytics_policy {
     metrics_realtime_update {
       enabled  = true
