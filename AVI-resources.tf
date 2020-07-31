@@ -157,7 +157,7 @@ resource "avi_wafpolicy" "horizon_waf_policy" {
   enable_app_learning = false
   mode = "WAF_MODE_DETECTION_ONLY"
   paranoia_level = "WAF_MODE_LEVEL_ONLY"
-  whitelist {
+  /*whitelist {
      rules {
          name = "Tunnel URI whitelist"
          match {
@@ -168,7 +168,7 @@ resource "avi_wafpolicy" "horizon_waf_policy" {
          actions = "WAF_POLICY_WHITELIST_ACTION_ALLOW"
         }
      }
-   }
+   }*/
 }
 
 // L7 Virtual Service with WAF
