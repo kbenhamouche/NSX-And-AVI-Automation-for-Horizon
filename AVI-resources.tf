@@ -136,7 +136,7 @@ resource "avi_wafprofile" "horizon_waf_profile" {
     max_execution_time = 50
     min_confidence = "CONFIDENCE_VERY_HIGH"
     enable_auto_rule_updates = true
-    client_request_max_body_size= 1024
+    //client_request_max_body_size= 1024
 }
 
 // WAF policy
