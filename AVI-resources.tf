@@ -150,7 +150,7 @@ resource "avi_wafprofile" "horizon_waf_profile" {
 }
 
 // WAF policy
-/resource "avi_wafpolicy" "horizon_waf_policy" {
+resource "avi_wafpolicy" "horizon_waf_policy" {
   name = "horizon_waf_policy"
   waf_profile_ref = data.avi_wafprofile.horizon_waf_profile.id // attach the WAF profile
   enable_app_learning = false
