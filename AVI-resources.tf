@@ -44,11 +44,11 @@ data "avi_networkprofile" "System-UDP-Fast-Path-VDI" {
 }
 
 data "avi_wafprofile" "horizon_waf_profile" {
-  name = "horizon_waf_profile"
+  name = "Horizon_waf_profile"
 }
 
 data "avi_wafpolicy" "horizon_waf_policy" {
-  name = "horizon_waf_policy"
+  name = "Horizon_waf_policy"
 }
 
 // Custom Heath Monitor
@@ -134,7 +134,7 @@ resource "avi_vsvip" "horizon_vsvip" {
 
 // WAF profile
 resource "avi_wafprofile" "horizon_waf_profile" {
-  name = "horizon_waf_profile"
+  name = "Horizon_waf_profile"
   config {
     learning_params {
       enable_per_uri_learning = true
@@ -152,11 +152,13 @@ resource "avi_wafprofile" "horizon_waf_profile" {
 
 // WAF policy
 resource "avi_wafpolicy" "horizon_waf_policy" {
-  name = "horizon_waf_policy"
-  waf_profile_ref = data.avi_wafprofile.horizon_waf_profile.id // attach the WAF profile
-  enable_app_learning = false
+  name = "Horizon_waf_policy"
   mode = "WAF_MODE_DETECTION_ONLY"
+  enable_app_learning = false
   paranoia_level = "WAF_MODE_LEVEL_ONLY"
+  failure_mode = "WAF_FAILURE_MODE_OPEN"
+  allow_mode_delegation = true
+  waf_profile_ref = data.avi_wafprofile.horizon_waf_profile.id // attach the WAF profile
   /*whitelist {
      rules {
          name = "Tunnel URI whitelist"
