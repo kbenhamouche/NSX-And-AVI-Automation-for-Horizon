@@ -150,13 +150,13 @@ resource "avi_wafprofile" "horizon_waf_profile" {
 }
 
 // WAF policy
-resource "avi_wafpolicy" "horizon_waf_policy" {
+/*resource "avi_wafpolicy" "horizon_waf_policy" {
   name = "horizon_waf_policy"
   waf_profile_ref = data.avi_wafpolicy.horizon_waf_policy.id
   enable_app_learning = false
   mode = "WAF_MODE_DETECTION_ONLY"
   paranoia_level = "WAF_MODE_LEVEL_ONLY"
-  /*whitelist {
+  whitelist {
      rules {
          name = "Tunnel URI whitelist"
          match {
@@ -167,8 +167,8 @@ resource "avi_wafpolicy" "horizon_waf_policy" {
          actions = "WAF_POLICY_WHITELIST_ACTION_ALLOW"
         }
      }
-  }*/
-}
+   }
+}*/
 
 
 
