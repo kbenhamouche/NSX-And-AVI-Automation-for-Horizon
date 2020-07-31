@@ -1,6 +1,16 @@
 # This terraform can be used to configure Avi for Horizon in a Shared VIP with L7 and L4 Virtual Services.
 # https://avinetworks.com/docs/18.2/configure-avi-vantage-for-vmware-horizon/
 
+/* STEPS
+1- Define the Health Monitor Template
+2- Define the Group  Template for pools (optional)
+3- Define Pool Servers
+4- Define the VIP@
+5- Define the WAF profile (optional)
+6- Define the WAF policy (optional)
+7- Define the Virtual Services
+*/
+
 data "avi_network" "placement_net" {
    name = var.mgmt_net
 }
@@ -146,7 +156,7 @@ resource "avi_wafpolicy" "horizon_waf_policy" {
   enable_app_learning = false
   mode = "WAF_MODE_DETECTION_ONLY"
   paranoia_level = "WAF_MODE_LEVEL_ONLY"
-  whitelist {
+  /*whitelist {
      rules {
          name = "Tunnel URI whitelist"
          match {
@@ -157,7 +167,7 @@ resource "avi_wafpolicy" "horizon_waf_policy" {
          actions = "WAF_POLICY_WHITELIST_ACTION_ALLOW"
         }
      }
-  }
+  }*/
 }
 
 
