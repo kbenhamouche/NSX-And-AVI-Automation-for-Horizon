@@ -49,14 +49,6 @@ variable "pool_server2" {
   default = "172.51.0.165"
 }
 
-variable "app_profile" {
-  default = "System-Secure-HTTP"
-}
-  
-variable "horizon_cert" {
-  default = "System-Default-Cert"
-}
-
 variable "horizon_hm" {
   default = "Horizon-HTTPS-Health-Monitor"
 }
@@ -65,16 +57,8 @@ variable "ip_group" {
   default = "Horizon-UAG-Servers-Group"
 }
 
-variable "ssl_profile" {
-  default = "System-Standard"
-}
-
 variable "l4_pool" {
   default = "Horizon-L4-Pool"
-}
-
-variable "l4_app_profile" {
-  default = "System-L4-Application"
 }
 
 variable "l7_pool" {
@@ -84,6 +68,15 @@ variable "l7_pool" {
 variable "l7_vs" {
   default = "Horizon-UAG-L7-VS"
 }
+
 variable "l4_vs" {
   default = "Horizon-UAG-L4-VS"
+}
+
+variable "horizon_wafprofile" {
+  default = "Horizon_WAF_profile"
+}
+
+variable "horizon_wafpolicy" {
+  default = "Horizon_WAF_policy"
 }

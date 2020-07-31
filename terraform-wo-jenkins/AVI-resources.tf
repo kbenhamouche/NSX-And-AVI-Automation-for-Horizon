@@ -1,20 +1,22 @@
 # This terraform can be used to configure Avi for Horizon in a Shared VIP with L7 and L4 Virtual Services.
 # https://avinetworks.com/docs/18.2/configure-avi-vantage-for-vmware-horizon/
 
-data "avi_network" "placement_net" {
-   name = var.mgmt_net
-}
+/* STEPS
+1- Define the Health Monitor Template
+2- Define the Group  Template for pools (optional)
+3- Define Pool Servers
+4- Define the VIP@
+5- Define the WAF profile (optional)
+6- Define the WAF policy (optional)
+7- Define the Virtual Services
+*/
 
 data "avi_sslprofile" "system-standard" {
-   name = var.ssl_profile
+   name = "System-Standard"
 }
 
 data "avi_sslkeyandcertificate" "horizon_cert" {
-   name = var.horizon_cert
-}
-
-data "avi_cloud" "horizon_cloud" {
-   name = var.cloud_name
+   name = "System-Default-Cert"
 }
 
 data "avi_applicationprofile" "horizon_L7app_profile" {
@@ -22,7 +24,7 @@ data "avi_applicationprofile" "horizon_L7app_profile" {
 }
 
 data "avi_applicationprofile" "horizon_app_profile" {
-   name = var.l4_app_profile
+   name = "System-L4-Application"
 }
 
 data "avi_networkprofile" "system-tcp-proxy" {
@@ -33,8 +35,20 @@ data "avi_networkprofile" "System-UDP-Fast-Path-VDI" {
    name = "System-UDP-Fast-Path-VDI"
 }
 
-data "avi_wafpolicy" "waf_app_learning_policy" {
-  name = "waf_app_learning_policy"
+data "avi_network" "placement_net" {
+   name = var.mgmt_net
+}
+
+data "avi_cloud" "horizon_cloud" {
+   name = var.cloud_name
+}
+
+data "avi_wafprofile" "horizon_waf_profile" {
+  name = var.horizon_wafprofile
+}
+
+data "avi_wafpolicy" "horizon_waf_policy" {
+  name = var.horizon_wafpolicy
 }
 
 // Custom Heath Monitor
@@ -103,7 +117,7 @@ resource "avi_pool" "blast_pcoip_pool" {
    name = var.l4_pool
 }
 
-// 
+// Shared VIP@
 resource "avi_vsvip" "horizon_vsvip" {
    name = "horizon-vsvip"
    cloud_ref = data.avi_cloud.horizon_cloud.id
@@ -116,6 +130,47 @@ resource "avi_vsvip" "horizon_vsvip" {
    dns_info {
       fqdn = var.domain_name
    }
+}
+
+// WAF profile
+resource "avi_wafprofile" "horizon_waf_profile" {
+  name = var.horizon_wafprofile
+  config {
+    learning_params {
+      enable_per_uri_learning = true
+      max_uris = 100
+      min_hits_to_learn = 20
+      sampling_percent = 100
+      update_interval = 1
+    }
+    max_execution_time = 50
+    min_confidence = "CONFIDENCE_VERY_HIGH"
+    enable_auto_rule_updates = true
+    client_request_max_body_size= 1024
+  }
+}
+
+// WAF policy
+resource "avi_wafpolicy" "horizon_waf_policy" {
+  name = var.horizon_wafpolicy
+  allow_mode_delegation = true
+  failure_mode = "WAF_FAILURE_MODE_OPEN"
+  mode = "WAF_MODE_DETECTION_ONLY"
+  enable_app_learning = false
+  paranoia_level = "WAF_PARANOIA_LEVEL_LOW"
+  waf_profile_ref = avi_wafprofile.horizon_waf_profile.id
+  /*whitelist {
+     rules {
+         name = "Tunnel URI whitelist"
+         match {
+           path {
+            match_criteria = "CONTAINS"
+            match_str = "/ice/tunnel/"
+           }
+         actions = "WAF_POLICY_WHITELIST_ACTION_ALLOW"
+        }
+     }
+   }*/
 }
 
 // L7 Virtual Service with WAF
@@ -132,7 +187,7 @@ resource "avi_virtualservice" "https_xml-api_VS" {
    network_profile_ref = data.avi_networkprofile.system-tcp-proxy.id
    cloud_ref = data.avi_cloud.horizon_cloud.id
    vsvip_ref = avi_vsvip.horizon_vsvip.id
-   waf_policy_ref = data.avi_wafpolicy.waf_app_learning_policy.id //WAF config
+   waf_policy_ref = avi_wafpolicy.horizon_waf_policy.id //WAF config
    analytics_policy {
     metrics_realtime_update {
       enabled  = true

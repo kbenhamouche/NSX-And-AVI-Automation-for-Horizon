@@ -11,20 +11,12 @@
 7- Define the Virtual Services
 */
 
-data "avi_network" "placement_net" {
-   name = var.mgmt_net
-}
-
 data "avi_sslprofile" "system-standard" {
-   name = var.ssl_profile
+   name = "System-Standard"
 }
 
 data "avi_sslkeyandcertificate" "horizon_cert" {
-   name = var.horizon_cert
-}
-
-data "avi_cloud" "horizon_cloud" {
-   name = var.cloud_name
+   name = "System-Default-Cert"
 }
 
 data "avi_applicationprofile" "horizon_L7app_profile" {
@@ -32,7 +24,7 @@ data "avi_applicationprofile" "horizon_L7app_profile" {
 }
 
 data "avi_applicationprofile" "horizon_app_profile" {
-   name = var.l4_app_profile
+   name = "System-L4-Application"
 }
 
 data "avi_networkprofile" "system-tcp-proxy" {
@@ -43,12 +35,20 @@ data "avi_networkprofile" "System-UDP-Fast-Path-VDI" {
    name = "System-UDP-Fast-Path-VDI"
 }
 
+data "avi_network" "placement_net" {
+   name = var.mgmt_net
+}
+
+data "avi_cloud" "horizon_cloud" {
+   name = var.cloud_name
+}
+
 data "avi_wafprofile" "horizon_waf_profile" {
-  name = "Horizon_waf_profile"
+  name = var.horizon_wafprofile
 }
 
 data "avi_wafpolicy" "horizon_waf_policy" {
-  name = "Horizon_waf_policy"
+  name = var.horizon_wafpolicy
 }
 
 // Custom Heath Monitor
@@ -134,7 +134,7 @@ resource "avi_vsvip" "horizon_vsvip" {
 
 // WAF profile
 resource "avi_wafprofile" "horizon_waf_profile" {
-  name = "Horizon_waf_profile"
+  name = var.horizon_wafprofile
   config {
     learning_params {
       enable_per_uri_learning = true
@@ -152,13 +152,13 @@ resource "avi_wafprofile" "horizon_waf_profile" {
 
 // WAF policy
 resource "avi_wafpolicy" "horizon_waf_policy" {
-  name = "Horizon_waf_policy"
+  name = var.horizon_wafpolicy
+  allow_mode_delegation = true
+  failure_mode = "WAF_FAILURE_MODE_OPEN"
   mode = "WAF_MODE_DETECTION_ONLY"
   enable_app_learning = false
-  paranoia_level = "WAF_MODE_LEVEL_ONLY"
-  failure_mode = "WAF_FAILURE_MODE_OPEN"
-  allow_mode_delegation = true
-  waf_profile_ref = data.avi_wafprofile.horizon_waf_profile.id // attach the WAF profile
+  paranoia_level = "WAF_PARANOIA_LEVEL_LOW"
+  waf_profile_ref = avi_wafprofile.horizon_waf_profile.id
   /*whitelist {
      rules {
          name = "Tunnel URI whitelist"
@@ -187,7 +187,7 @@ resource "avi_virtualservice" "https_xml-api_VS" {
    network_profile_ref = data.avi_networkprofile.system-tcp-proxy.id
    cloud_ref = data.avi_cloud.horizon_cloud.id
    vsvip_ref = avi_vsvip.horizon_vsvip.id
-   waf_policy_ref = data.avi_wafpolicy.horizon_waf_policy.id //WAF config
+   waf_policy_ref = avi_wafpolicy.horizon_waf_policy.id //WAF config
    analytics_policy {
     metrics_realtime_update {
       enabled  = true
