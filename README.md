@@ -1,9 +1,9 @@
 # NSX-And-AVI-Automation-for-Horizon
 
 Software release:
-- AVI controller release 18.2.8
+- AVI controller release 20.1.1
 - NSX-T Datacenter 3.0
-- Terraform v0.12
+- Terraform v0.13
 
 NSX and AVI automation via Terraform (and Jenkins for CICD pipeline - optional) for VMware Horizon solution.
 
